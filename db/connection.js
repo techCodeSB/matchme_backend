@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const url = "mongodb://localhost:27017/matchme";
+// const url = "mongodb://localhost:27017/matchme";
+const url = process.env.MONGO_URI;
 
 const connection = () => {
     return new Promise((resolve, reject) => {
@@ -8,7 +9,7 @@ const connection = () => {
             // useUnifiedTopology: true,
         })
         .then(() => resolve(true))
-        .catch((err) => reject(false));
+        .catch((err) => reject(err));
     });
 };
 
