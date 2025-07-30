@@ -1,27 +1,28 @@
 const mongoose = require("mongoose");
 
+const matchArray = new mongoose.Schema({
+    match_user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+    },
+    match_date: Date,
+    interest_send: Boolean,
+    interest_send_date: Date,
+    status: {
+        type: String,
+        enum: ["pending", "accepted", "rejected", "removed"],
+    },
+    status_change_date: Date
+}, { _id: false });
+
+
 const userMatchesSchema = new mongoose.Schema({
-    user1: String,
-    user2: String,
-    match_id: String, // sorted combination of user1 and user2
-    user1_match_number: Number,
-    user2_match_number: Number,
-    user1_shown: {
-        type: Boolean,
-        default: false,
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
     },
-    user2_shown: {
-        type: Boolean,
-        default: false,
-    },
-    acted_by_user1: {
-        type: Boolean,
-        default: false,
-    },
-    acted_by_user2: {
-        type: Boolean,
-        default: false,
-    },
+    matches: [matchArray]
+
 }, { timestamps: true });
 
 module.exports = new mongoose.model("usermatches", userMatchesSchema);

@@ -18,7 +18,7 @@ const middleware = async (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, jwtKey);
-        const user = await userModel.findOne({ whatsapp_number: decoded.phone });
+        const user = await userModel.findOne({ _id: decoded.id });
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });

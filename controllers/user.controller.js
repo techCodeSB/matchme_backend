@@ -218,7 +218,7 @@ const update = async (req, res) => {
         // userData come from middleware;
         const userData = req.userData;
 
-        const update = await userModel.updateOne({ whatsapp_number: userData.whatsapp_number }, {
+        const update = await userModel.updateOne({ _id: userData._id }, {
             $set: {
                 whatsapp_number, email, full_name, nick_name,
                 gender, dob, birth_time, birth_place, pin_code, country, locality, address,
@@ -280,7 +280,7 @@ const get = async (req, res) => {
 
     try {
         // Build query
-        let query = userModel.findOne({ whatsapp_number: userData.whatsapp_number });
+        let query = userModel.findOne({ _id: userData._id });
 
         // Add select clause if specific fields requested
         if (fieldsArr && Array.isArray(fieldsArr)) {
@@ -324,9 +324,9 @@ const upload = async (req, res) => {
         const userData = req.userData;
 
         // Update user with file paths
-        const update = await userModel.updateOne({ whatsapp_number: userData.whatsapp_number }, {
+        const update = await userModel.updateOne({ _id: userData._id }, {
             $set: {
-                image: req.filePaths
+                image: req.filePaths,
             }
         });
 

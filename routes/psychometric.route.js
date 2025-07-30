@@ -1,19 +1,17 @@
-const { add, get, remove } = require("../controllers/preferance.controller");
 const router = require("express").Router();
 const middleware = require("../middleware/middleware");
+const {add, get} = require("../controllers/psychometric.controller");
+
 
 
 router
     .route("/add")
     .post(middleware, add);
 
-router
-    .route("/get")
-    .post(middleware, get)
 
 router
-    .route("/delete")
-    .delete(middleware, remove)
+    .route("/get")
+    .get(middleware, get);
 
 
 module.exports = router;

@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+    token: String,
     user_name: { type: String, unique: true },
     password: { type: String, minlength: 6 },
     whatsapp_number: { type: String, trim: true, unique: true },
     email: { type: String, trim: true, unique: true },
-    token: String,
     full_name: { type: String, trim: true },
     nick_name: { type: String, trim: true },
     gender: { type: String, trim: true },
@@ -73,16 +73,18 @@ const userSchema = new mongoose.Schema({
     marital_status_to_year: Number,
     subscription_end_date: Date,
     is_subscribed: { type: Boolean, default: false },
+    psychometric_test: { type: Boolean, default: false },
+    psychometric_category: String,
     category: String,
     interests: { type: Array },
-    image: {type: Object},
+    image: { type: Object },
     registration_status: {
-        type:String,
+        type: String,
         default: 0 // 0 = incomplete 1=complete
     },
     registration_step: {
         type: String,
-	default: 0
+        default: 0
     }
 
 }, { timestamps: true })
