@@ -12,6 +12,7 @@ const path = require("path");
 // **************
 const login = async (req, res) => {
     const { userid, pass, emailPhone } = req.body;
+    console.log("hit");
 
     if (userid && pass) {
         try {
@@ -110,7 +111,7 @@ const register = async (req, res) => {
         business_website, profile_picture, family_picture, full_body_picture, fun_picture,
         user_type, eating_preferences, how_often_you_drink, are_you_a_smoker,
         how_often_you_workout, favourite_weekend_activities, holidays_prefrences,
-        how_often_you_eat_out, how_often_you_travel, prefered_social_event,
+        how_often_you_eat_out, how_often_you_travel, prefered_social_event,city,
         whom_do_you_like_going_out_with, how_spiritual_are_you, how_religious_are_you,
         about_yourself, marital_status_from_year, marital_status_to_year,
         subscription_end_date, is_subscribed, category, interests
@@ -136,7 +137,6 @@ const register = async (req, res) => {
             return res.status(500).json({ err: "Whatsapp number already exist" });
         }
 
-
         // create username and check existence;
         let username = full_name.replaceAll(' ', '');
         const pass = passwordGenerator(); //genreate password
@@ -161,7 +161,7 @@ const register = async (req, res) => {
             business_website, profile_picture, family_picture, full_body_picture, fun_picture,
             user_type, eating_preferences, how_often_you_drink, are_you_a_smoker,
             how_often_you_workout, favourite_weekend_activities, holidays_prefrences,
-            how_often_you_eat_out, how_often_you_travel, prefered_social_event,
+            how_often_you_eat_out, how_often_you_travel, prefered_social_event,city,
             whom_do_you_like_going_out_with, how_spiritual_are_you, how_religious_are_you,
             about_yourself, marital_status_from_year, marital_status_to_year,
             subscription_end_date, is_subscribed, category, interests
@@ -170,7 +170,6 @@ const register = async (req, res) => {
         if (!insert) {
             return res.status(500).json({ err: "User not register" });
         }
-
 
         return res.status(200).json({
             username: username,
@@ -205,7 +204,7 @@ const update = async (req, res) => {
         how_often_you_workout, favourite_weekend_activities, holidays_prefrences,
         how_often_you_eat_out, how_often_you_travel, prefered_social_event,
         whom_do_you_like_going_out_with, how_spiritual_are_you, how_religious_are_you,
-        about_yourself, marital_status_from_year, marital_status_to_year,
+        about_yourself, marital_status_from_year, marital_status_to_year,city,
         subscription_end_date, is_subscribed, category, interests, registration_status, registration_step
     } = req.body;
 
@@ -234,7 +233,7 @@ const update = async (req, res) => {
                 how_often_you_workout, favourite_weekend_activities, holidays_prefrences,
                 how_often_you_eat_out, how_often_you_travel, prefered_social_event,
                 whom_do_you_like_going_out_with, how_spiritual_are_you, how_religious_are_you,
-                about_yourself, marital_status_from_year, marital_status_to_year,
+                about_yourself, marital_status_from_year, marital_status_to_year,city,
                 subscription_end_date, is_subscribed, category, interests, registration_status, registration_step
             }
         })
@@ -258,7 +257,7 @@ const update = async (req, res) => {
             how_often_you_workout, favourite_weekend_activities, holidays_prefrences,
             how_often_you_eat_out, how_often_you_travel, prefered_social_event,
             whom_do_you_like_going_out_with, how_spiritual_are_you, how_religious_are_you,
-            about_yourself, marital_status_from_year, marital_status_to_year,
+            about_yourself, marital_status_from_year, marital_status_to_year,city,
             subscription_end_date, is_subscribed, category, interests, registration_status, registration_step
         });
 
@@ -271,15 +270,14 @@ const update = async (req, res) => {
 
 
 
-// *************************
+// ********************
 //  GET USER PROFILE
-// *************************
+// ********************
 const get = async (req, res) => {
     const { fieldsArr } = req.body;
     const userData = req.userData;
 
     try {
-        // Build query
         let query = userModel.findOne({ _id: userData._id });
 
         // Add select clause if specific fields requested
@@ -314,34 +312,46 @@ const get = async (req, res) => {
 //  SET PROFILE PICTURES
 // *************************
 const upload = async (req, res) => {
-
-    if (req.filePaths && Object.keys(req.filePaths).length < 1) {
-        return res.status(500).json({ err: "No files uploaded" });
+    if (!req.filePaths || Object.keys(req.filePaths).length < 1) {
+        return res.status(400).json({ err: "No files uploaded" });
     }
 
     try {
-        // userData come from middleware;
         const userData = req.userData;
 
-        // Update user with file paths
-        const update = await userModel.updateOne({ _id: userData._id }, {
-            $set: {
-                image: req.filePaths,
-            }
-        });
+        // Get existing user
+        const user = await userModel.findById(userData._id);
+        if (!user) {
+            return res.status(404).json({ err: "User not found" });
+        }
 
-        if (update.modifiedCount < 1) {
+        // Merge existing image object with new file paths
+        const updatedImage = {
+            ...user.image,
+            ...req.filePaths
+        };
+
+        // Update the user document
+        const result = await userModel.updateOne(
+            { _id: userData._id },
+            { $set: { image: updatedImage } }
+        );
+
+        if (result.modifiedCount < 1) {
             return res.status(500).json({ err: "Profile picture upload failed" });
         }
 
-        return res.status(200).json({ msg: "Profile picture uploaded successfully", image: req.filePaths });
+        return res.status(200).json({
+            msg: "Profile picture uploaded successfully",
+            image: updatedImage
+        });
 
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Upload Error:", error);
         return res.status(500).json({ err: "Something went wrong" });
     }
+};
 
-}
 
 
 

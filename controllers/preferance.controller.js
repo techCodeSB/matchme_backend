@@ -36,7 +36,6 @@ const add = async (req, res) => {
             }
 
             return res.status(200).json(update)
-
         }
 
         // insert data;
